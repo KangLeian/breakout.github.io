@@ -33,10 +33,11 @@
         var brickColumnCount = 9;
         var brickWidth = 75;
         var brickHeight = 20;
-        var brickPadding = 10;
-        var brickOffsetTop = 30;
-        var brickOffsetLeft = 30;
-        var interval = setInterval(draw, 3);
+        var brickPadding = 0;
+        var brickOffsetTop = 40;
+        var brickOffsetLeft = 40;
+        var ballSpeed =10;
+        var interval = setInterval(draw, ballSpeed);
         var score = 0;
         var lives = 5;
         var brickCounter=0;
@@ -44,19 +45,11 @@
         document.addEventListener("keydown", keyDownHandler, false);
         document.addEventListener("keyup", keyUpHandler, false);
         
-        //brick make
-        var bricks = [];
-        for(var c=0; c<brickColumnCount; c++) {
-            bricks[c] = [];
-            for(var r=0; r<brickRowCount; r++) {
-                bricks[c][r] = { x: 0, y: 0, status:1 };
-            }
-        }
 
         function drawBall() {
             ctx.beginPath();
             ctx.arc(x, y, ballRadius, 0, Math.PI*2);
-            ctx.fillStyle = "#brown";
+            ctx.fillStyle = "red";
             ctx.fill();
             ctx.closePath();
         }
@@ -70,6 +63,14 @@
             ctx.closePath();
         }
 
+        //brick make
+        var bricks = [];
+        for(var c=0; c<brickColumnCount; c++) {
+            bricks[c] = [];
+            for(var r=0; r<brickRowCount; r++) {
+                bricks[c][r] = { x: 0, y: 0, status:1 };
+            }
+        }
         //brick function
         function drawBricks() {
             brickCounter=0, winCondition=0
@@ -83,7 +84,7 @@
                             bricks[c][r].y = brickY;
                             ctx.beginPath();
                             ctx.rect(brickX, brickY, brickWidth, brickHeight);
-                            ctx.fillStyle = "#orange";
+                            ctx.fillStyle = "gold";
                             ctx.fill();
                             ctx.closePath();
                         }
@@ -97,24 +98,24 @@
         //score function
         function drawScore() {
             ctx.font = "16px Arial";
-            ctx.fillStyle = "#green";
+            ctx.fillStyle = "green";
             ctx.fillText("Score: "+score, 8, 20);
         }
 
         //lives function
         function drawLives() {
             ctx.font = "16px Arial";
-            ctx.fillStyle = "#red";
+            ctx.fillStyle = "red";
             ctx.fillText("Lives: "+lives, canvas.width-65, 20);
         }
         
         function draw() {
             ctx.clearRect(0, 0, canvas.width, canvas.height);
-            drawBricks();
             drawBall();
             drawPaddle();
             drawScore();
             drawLives();
+            drawBricks();
             collisionDetection();
             x += dx;
             y += dy;
@@ -123,6 +124,7 @@
             } else if(y + dy > canvas.height-ballRadius) {
                 if(x > paddleX && x < paddleX + paddleWidth) {
                     dy = -dy;
+                    if(ballSpeed>=3) ballSpeed=3;
                 }
                 else {
                     lives--;
@@ -179,10 +181,11 @@
                 for(var r=0; r<brickRowCount; r++) {
                     var b = bricks[c][r];
                     if(b.status==1){
-                        if(x > b.x && x < b.x+brickWidth && y > b.y && y < b.y+brickHeight) {
+                        if(x > b.x && x < b.x+brickWidth && y > b.y && y < b.y+brickHeight && b.x!=0 && b.y!=0){
                             dy = -dy;
                             b.status=0;
                             score++;
+                            console.log(score, winCondition, 'b.x=', b.x,'b.y=', b.y,)
                             if(score >= winCondition) {
                                 alert("Cie bisa menang");
                                 document.location.reload();
